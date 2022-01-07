@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/constants.dart';
 import 'package:news_app/home_screen/home_view.dart';
 
 void main() {
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: secondaryColor1
       ),
       home: HomeView(),
     );
