@@ -4,6 +4,7 @@ import 'package:news_app/data_model/news.dart';
 import 'package:news_app/home_screen/country_list_view.dart';
 import 'package:news_app/home_screen/select_location.dart';
 import 'package:news_app/home_screen/sources_list_view.dart';
+import 'package:news_app/search_screen/search_view.dart';
 import 'package:news_app/shared/bottom_sheet.dart';
 import 'package:news_app/shared/news_list.dart';
 import 'package:news_app/shared/spinner.dart';
@@ -95,32 +96,38 @@ class _HomeViewState extends State<HomeView> {
           padding: const EdgeInsets.only(left: 20,right: 20,bottom: 60),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20,bottom: 30),
-                child: Container(
-                  height: 40,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: secondaryColor2,
-                    borderRadius: BorderRadius.circular(5)
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Search for news, topics...',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color:  Colors.grey[500]
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SearchView()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20,bottom: 30),
+                  child: Container(
+                    height: 40,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: secondaryColor2,
+                      borderRadius: BorderRadius.circular(5)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Search for news, topics...',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color:  Colors.grey[500]
+                            ),
                           ),
-                        ),
-                        Icon(
-                          Icons.search,
-                          color: Colors.grey[700],
-                        )
-                      ],
+                          Icon(
+                            Icons.search,
+                            color: Colors.grey[700],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
