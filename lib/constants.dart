@@ -30,6 +30,9 @@ const Map<String, String> newsSourceMap = {
   'Bloomberg': 'bloomberg'
 };
 
+// pageSize used while making get request
+const String pageSize = '5';
+
 // user selected variable values
 class SelectedVar {
   static String country = 'in';
