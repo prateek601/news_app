@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/constants.dart';
 import 'package:news_app/data_model/news.dart';
+import 'package:news_app/home_screen/country_list_view.dart';
 import 'package:news_app/home_screen/select_location.dart';
 import 'package:news_app/home_screen/sources_list_view.dart';
 import 'package:news_app/shared/bottom_sheet.dart';
@@ -32,8 +33,13 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     _pageSize = int.parse(pageSize);
 
-    String countryCode = WidgetsBinding.instance!.window.locale.countryCode!;
-    SelectedVar.country = countryCode.toLowerCase();
+    String? countryCode = WidgetsBinding.instance!.window.locale.countryCode;
+    if(countryCode != null) {
+      String countryCodeToLowerCase = countryCode.toLowerCase();
+      String country = countryMap.keys.firstWhere((k) => countryMap[k] ==
+          countryCodeToLowerCase, orElse: () => 'India');
+      SelectedVar.country = country;
+    }
 
     fetchData();
 
@@ -63,10 +69,16 @@ class _HomeViewState extends State<HomeView> {
             Text(
               'MyNEWS',
               style: TextStyle(
-                color: secondaryColor1
+                color: secondaryColor1,
+                fontSize: 18
               ),
             ),
-            SelectLocation()
+            InkWell(
+              onTap: () {
+                openCountryBottomSheet();
+              },
+              child: SelectLocation()
+            )
           ],
         ),
       ),
@@ -193,8 +205,10 @@ class _HomeViewState extends State<HomeView> {
     String pageNum = page.toString();
     String url;
     String sources = '';
+    String country = countryMap[SelectedVar.country]!;
+
     if(SelectedVar.sources.isEmpty) {
-      url = 'https://newsapi.org/v2/top-headlines?country=${SelectedVar.country}'
+      url = 'https://newsapi.org/v2/top-headlines?country=$country'
           '&sortBy=${SelectedVar.sortBy}&pageSize=$pageSize&page=$pageNum';
     } else {
       for(int i=0; i<SelectedVar.sources.length ; i++) {
@@ -227,6 +241,26 @@ class _HomeViewState extends State<HomeView> {
           });
         },
         onRequestFailed: () {}
+    );
+  }
+
+  void openCountryBottomSheet() {
+    bottomSheet(
+      heading: 'Choose your location',
+      context: context,
+      buttonName: 'Apply',
+      listWidget: CountryListView(),
+      onButtonTap: () {
+        // clearing selected news source list as country and sources cannot be
+        // used together to make get request
+        // https://newsapi.org/docs/endpoints/top-headlines
+        SelectedVar.sources.clear();
+        page = 1;
+        fetchData();
+        setState(() {
+          isLoading = true;
+        });
+      }
     );
   }
 

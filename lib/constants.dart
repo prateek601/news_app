@@ -35,7 +35,7 @@ const String pageSize = '5';
 
 // user selected variable values
 class SelectedVar {
-  static String country = 'in';
+  static String country = 'India';
   static String sortBy = 'publishedAt';
   static List sources = [];
 }
