@@ -4,6 +4,7 @@ import 'package:http/http.dart'as http;
 
 typedef void OnRequestCompleted(responseBody);
 typedef void OnRequestFailed();
+typedef void NoInternet();
 
 class HttpUtil {
 
@@ -14,7 +15,8 @@ class HttpUtil {
   Future<void> makeGetRequest({
   required String url,
   required OnRequestCompleted onRequestCompleted,
-  required OnRequestFailed onRequestFailed
+  required OnRequestFailed onRequestFailed,
+  NoInternet? noInternet
   }) async {
     try {
       http.Response response = await http.get(Uri.parse(url), headers: _headers);
@@ -26,6 +28,8 @@ class HttpUtil {
       }
     } catch(e) {
       print(e);
+      if(noInternet != null)
+      noInternet();
     }
   }
 }

@@ -300,7 +300,12 @@ class _HomeViewState extends State<HomeView> {
             }
           });
         },
-        onRequestFailed: () {}
+        onRequestFailed: () {},
+        noInternet: () {
+          setState(() {
+            state = screenState.noInternet;
+          });
+        }
     );
   }
 
