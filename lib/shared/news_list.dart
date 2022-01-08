@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/data_model/news.dart';
+import 'package:news_app/detailed_news_screen/detailed_news.dart';
 
 typedef void OnMaxScrollExtent();
 
@@ -31,71 +32,80 @@ class _NewsListState extends State<NewsList> {
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Container(
-              height: 140,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.white
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  this.widget.articles[index].source.name,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    fontStyle: FontStyle.italic
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => DetailedNews(
+                        article: this.widget.articles[index])
+                  )
+                );
+              },
+              child: Container(
+                height: 140,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    this.widget.articles[index].source.name,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FontStyle.italic
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 5,),
-                                Text(
-                                  this.widget.articles[index].title,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                ),
-                              ],
-                            ),
-                            Text(
-                              published(index),
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey
+                                  SizedBox(height: 5,),
+                                  Text(
+                                    this.widget.articles[index].title,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
+                                  ),
+                                ],
                               ),
-                            )
-                          ],
+                              Text(
+                                published(index),
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: Image.network(
-                              this.widget.articles[index].urlToImage,
-                              fit: BoxFit.cover,
-                              height: double.infinity,
+                      Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: Image.network(
+                                this.widget.articles[index].urlToImage,
+                                fit: BoxFit.cover,
+                                height: double.infinity,
+                              ),
                             ),
-                          ),
-                        )
-                    )
-                  ],
+                          )
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
