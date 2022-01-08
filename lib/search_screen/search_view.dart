@@ -77,6 +77,7 @@ class _SearchViewState extends State<SearchView> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20,bottom: 30),
                   child: TextField(
+                    autofocus: true,
                     textInputAction: TextInputAction.search,
                     controller: textController,
                     cursorColor: Colors.black,
@@ -101,6 +102,7 @@ class _SearchViewState extends State<SearchView> {
                     ),
                     onEditingComplete: () {
                       query = textController.text;
+                      if(query.trim().length > 0)
                       fetchData();
                     },
                   ),
@@ -139,7 +141,6 @@ class _SearchViewState extends State<SearchView> {
         isLoading = true;
       });
     }
-    print(query);
     String url = 'https://newsapi.org/v2/everything?q=$query&pageSize='
         '$pageSize&page=$page';
 
