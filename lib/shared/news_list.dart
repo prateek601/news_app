@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/constants.dart';
 import 'package:news_app/data_model/news.dart';
 
 typedef void OnMaxScrollExtent();
@@ -118,8 +117,8 @@ class _NewsListState extends State<NewsList> {
       return '${difference.inHours} hours ago';
     } else if(difference.inHours > 0) {
       return '${difference.inHours} hour ago';
-    } else if(difference.inMinutes > 1) {
-      return '${difference.inDays} minutes ago';
+    } else if(difference.inMinutes > 0) {
+      return '${difference.inMinutes} min ago';
     } else {
       return 'a moment ago';
     }
