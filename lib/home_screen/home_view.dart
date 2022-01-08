@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:news_app/constants.dart';
 import 'package:news_app/data_model/news.dart';
@@ -7,8 +9,16 @@ import 'package:news_app/home_screen/sources_list_view.dart';
 import 'package:news_app/search_screen/search_view.dart';
 import 'package:news_app/shared/bottom_sheet.dart';
 import 'package:news_app/shared/news_list.dart';
+import 'package:news_app/shared/no_internet_view.dart';
 import 'package:news_app/shared/spinner.dart';
+import 'package:news_app/util/check_internet.dart';
 import 'package:news_app/util/http_util.dart';
+
+enum screenState {
+  loading,
+  noInternet,
+  dataFetched,
+}
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -18,7 +28,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  bool isLoading = true;
   late News news;
   int page = 1;
   List<Article> articles = [];
@@ -28,10 +37,20 @@ class _HomeViewState extends State<HomeView> {
   late int _pageSize;
 
   var scrollController = ScrollController();
+  var state = screenState.loading;
 
   @override
   void initState() {
     super.initState();
+    checkInternet(
+      internetConnected: () {
+        fetchData();
+      },
+      internetNotConnected: () {
+        state = screenState.noInternet;
+      }
+    );
+
     _pageSize = int.parse(pageSize);
 
     String? countryCode = WidgetsBinding.instance!.window.locale.countryCode;
@@ -41,8 +60,6 @@ class _HomeViewState extends State<HomeView> {
           countryCodeToLowerCase, orElse: () => 'India');
       SelectedVar.country = country;
     }
-
-    fetchData();
 
     scrollController.addListener(() {
       if(scrollController.position.pixels == scrollController.position.maxScrollExtent) {
@@ -83,14 +100,40 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: state == screenState.noInternet
+        ?
+      null
+        :
+      FloatingActionButton(
         onPressed: () {
           openBottomSheet();
         },
         backgroundColor: primaryColor1,
         child: const Icon(Icons.sort),
+        tooltip: 'News source',
       ),
-      body: SingleChildScrollView(
+      body: state == screenState.noInternet
+      ?
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              NoInternetView(
+                connectionResumed: () {
+                  setState(() {
+                    state = screenState.loading;
+                  });
+                  fetchData();
+                },
+              ),
+            ],
+          ),
+        ],
+      )
+      :
+      SingleChildScrollView(
         controller: scrollController,
         child: Padding(
           padding: const EdgeInsets.only(left: 20,right: 20,bottom: 60),
@@ -171,7 +214,7 @@ class _HomeViewState extends State<HomeView> {
                             onChanged: (value) {
                               if(SelectedVar.sources.isNotEmpty) {
                                 setState(() {
-                                  isLoading = true;
+                                  state = screenState.loading;
                                   SelectedVar.sortBy = value!;
                                 });
                                 fetchData();
@@ -193,21 +236,7 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              isLoading
-              ?
-              Spinner()
-              :
-              NewsList(
-                articles: articles,
-              ),
-              reachedMaxScrollExtent
-              ?
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Spinner(),
-              )
-              :
-              Container()
+              myWidget()
             ],
           ),
         ),
@@ -225,7 +254,7 @@ class _HomeViewState extends State<HomeView> {
         page = 1;
         fetchData();
         setState(() {
-          isLoading = true;
+          state = screenState.loading;
         });
       }
     );
@@ -259,7 +288,7 @@ class _HomeViewState extends State<HomeView> {
         onRequestCompleted: (responseBody) {
           setState(() {
             news = News.fromJson(responseBody);
-            isLoading = false;
+            state = screenState.dataFetched;
             if(reachedMaxExtent) {
               articles.addAll(news.articles);
               reachedMaxScrollExtent = false;
@@ -289,7 +318,7 @@ class _HomeViewState extends State<HomeView> {
         page = 1;
         fetchData();
         setState(() {
-          isLoading = true;
+          state = screenState.loading;
         });
       }
     );
@@ -303,6 +332,29 @@ class _HomeViewState extends State<HomeView> {
         )
       )
     );
+  }
+
+   Widget myWidget() {
+    switch(state) {
+      case screenState.loading:
+        return Spinner();
+      default:
+        return Column(
+          children: [
+            NewsList(
+              articles: articles,
+            ),
+            reachedMaxScrollExtent
+                ?
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Spinner(),
+            )
+                :
+            Container()
+          ],
+        );
+    }
   }
 
 }
