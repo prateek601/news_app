@@ -8,7 +8,7 @@ typedef void OnRequestFailed();
 class HttpUtil {
 
   Map <String, String> _headers = {
-     'X-Api-Key': '42c230defe3b40aa871ee0e177527761'
+     'X-Api-Key': 'f193b8f1536f4d4caa9f6f6a92d5d304'
   };
 
   Future<void> makeGetRequest({

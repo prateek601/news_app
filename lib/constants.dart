@@ -9,6 +9,7 @@ const Color secondaryColor2 = Color(0xffCED3DC);
 // country list and news sources list
 const List<String> countryList = ['Australia', 'USA', 'India', 'South Africa', 'France', 'Germany'];
 const List<String> newsSources = ['ABC News', 'Business Insider', 'CNN', 'The Hindu', 'Google News (India)', 'Bloomberg'];
+const List<String> sortPreference = ['Popular', 'Newest', 'Relevant'];
 
 // Map of country and country code
 const Map<String, String> countryMap = {
@@ -30,12 +31,19 @@ const Map<String, String> newsSourceMap = {
   'Bloomberg': 'bloomberg'
 };
 
+// Map of sortPreference and there ids
+const Map<String, String> sortPreferenceMap = {
+  'Popular': 'popularity',
+  'Newest': 'publishedAt',
+  'Relevant': 'relevancy'
+};
+
 // pageSize used while making get request
-const String pageSize = '5';
+const String pageSize = '10';
 
 // user selected variable values
 class SelectedVar {
   static String country = 'India';
-  static String sortBy = 'publishedAt';
+  static String sortBy = 'Newest';
   static List sources = [];
 }

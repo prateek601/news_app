@@ -148,15 +148,38 @@ class _HomeViewState extends State<HomeView> {
                             color: Colors.grey[700]
                           ),
                         ),
-                        Text(
-                          'Newest',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[900],
-                          )
-                        ),
-                        Icon(
-                          Icons.arrow_drop_down
+                        DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            items: sortPreference.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    color: primaryColor2,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if(SelectedVar.sources.isNotEmpty) {
+                                setState(() {
+                                  isLoading = true;
+                                  SelectedVar.sortBy = value!;
+                                });
+                                fetchData();
+                              } else {
+                                showToast();
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            value: SelectedVar.sortBy,
+                            isDense: true,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[900]
+                            ),
+                          ),
                         )
                       ],
                     )
@@ -209,7 +232,7 @@ class _HomeViewState extends State<HomeView> {
 
     if(SelectedVar.sources.isEmpty) {
       url = 'https://newsapi.org/v2/top-headlines?country=$country'
-          '&sortBy=${SelectedVar.sortBy}&pageSize=$pageSize&page=$pageNum';
+          '&pageSize=$pageSize&page=$pageNum';
     } else {
       for(int i=0; i<SelectedVar.sources.length ; i++) {
         String selectedSources = newsSourceMap[SelectedVar.sources[i]]!;
@@ -219,7 +242,8 @@ class _HomeViewState extends State<HomeView> {
           sources = sources + selectedSources + ',';
         }
       }
-      url = 'https://newsapi.org/v2/top-headlines?sources=$sources'
+      String sortBy = sortPreferenceMap[SelectedVar.sortBy]!;
+      url = 'https://newsapi.org/v2/everything?sources=$sources&sortBy=$sortBy'
           '&pageSize=$pageSize&page=$pageNum';
     }
 
@@ -261,6 +285,16 @@ class _HomeViewState extends State<HomeView> {
           isLoading = true;
         });
       }
+    );
+  }
+
+  void showToast() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            'First select the news source then apply the sort preference'
+        )
+      )
     );
   }
 
