@@ -18,13 +18,37 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   bool isLoading = true;
   late News news;
+  int page = 1;
+  List<Article> articles = [];
+  bool reachedMaxScrollExtent = false;
+  int totalResults = 0;
+  int totalPages = 1;
+  late int _pageSize;
+
+  var scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _pageSize = int.parse(pageSize);
+
     String countryCode = WidgetsBinding.instance!.window.locale.countryCode!;
     SelectedVar.country = countryCode.toLowerCase();
+
     fetchData();
+
+    scrollController.addListener(() {
+      if(scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        print(page);
+        page++;
+        if(page <= totalPages) {
+          fetchData(reachedMaxExtent: true);
+          setState(() {
+            reachedMaxScrollExtent = true;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -54,6 +78,7 @@ class _HomeViewState extends State<HomeView> {
         child: const Icon(Icons.sort),
       ),
       body: SingleChildScrollView(
+        controller: scrollController,
         child: Padding(
           padding: const EdgeInsets.only(left: 20,right: 20,bottom: 60),
           child: Column(
@@ -130,7 +155,17 @@ class _HomeViewState extends State<HomeView> {
               ?
               Spinner()
               :
-              NewsList(news: news)
+              NewsList(
+                articles: articles,
+              ),
+              reachedMaxScrollExtent
+              ?
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Spinner(),
+              )
+              :
+              Container()
             ],
           ),
         ),
@@ -145,6 +180,7 @@ class _HomeViewState extends State<HomeView> {
       listWidget: SourcesListView(),
       buttonName: 'Apply Filter',
       onButtonTap: () {
+        page = 1;
         fetchData();
         setState(() {
           isLoading = true;
@@ -153,12 +189,13 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  void fetchData() {
+  void fetchData({bool reachedMaxExtent = false}) {
+    String pageNum = page.toString();
     String url;
     String sources = '';
     if(SelectedVar.sources.isEmpty) {
       url = 'https://newsapi.org/v2/top-headlines?country=${SelectedVar.country}'
-          '&sortBy=${SelectedVar.sortBy}';
+          '&sortBy=${SelectedVar.sortBy}&pageSize=$pageSize&page=$pageNum';
     } else {
       for(int i=0; i<SelectedVar.sources.length ; i++) {
         String selectedSources = newsSourceMap[SelectedVar.sources[i]]!;
@@ -168,7 +205,8 @@ class _HomeViewState extends State<HomeView> {
           sources = sources + selectedSources + ',';
         }
       }
-      url = 'https://newsapi.org/v2/top-headlines?sources=$sources';
+      url = 'https://newsapi.org/v2/top-headlines?sources=$sources'
+          '&pageSize=$pageSize&page=$pageNum';
     }
 
     HttpUtil().makeGetRequest(
@@ -177,6 +215,15 @@ class _HomeViewState extends State<HomeView> {
           setState(() {
             news = News.fromJson(responseBody);
             isLoading = false;
+            if(reachedMaxExtent) {
+              articles.addAll(news.articles);
+              reachedMaxScrollExtent = false;
+            } else {
+              articles.clear();
+              articles.addAll(news.articles);
+              totalResults = news.totalResults;
+              totalPages = totalResults~/_pageSize + 1;
+            }
           });
         },
         onRequestFailed: () {}

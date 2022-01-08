@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/data_model/news.dart';
 
-class NewsList extends StatelessWidget {
-  final News news;
+typedef void OnMaxScrollExtent();
+
+class NewsList extends StatefulWidget {
+  final List<Article> articles;
   const NewsList({
     Key? key,
-    required this.news
+    required this.articles,
   }) : super(key: key);
 
   @override
+  State<NewsList> createState() => _NewsListState();
+}
+
+class _NewsListState extends State<NewsList> {
+
+  @override
   Widget build(BuildContext context) {
-    return this.news.articles.isEmpty
+    return this.widget.articles.isEmpty
       ?
     Center(
       child: Text('No results available.Try Again')
     )
       :
     ListView.builder(
-        itemCount: news.articles.length,
+        itemCount: this.widget.articles.length,
         shrinkWrap: true,
         physics: ScrollPhysics(),
         itemBuilder: (context, index) {
@@ -38,14 +46,20 @@ class NewsList extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(news.articles[index].source.name),
+                          Text(
+                            this.widget.articles[index].source.name,
+                            maxLines: 1,
+                          ),
                           SizedBox(height: 5,),
                           Text(
-                            news.articles[index].title,
+                            this.widget.articles[index].title,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 4,
                           ),
-                          Text(news.articles[index].publishedAt)
+                          Text(
+                            this.widget.articles[index].publishedAt,
+                            maxLines: 1,
+                          )
                         ],
                       ),
                     ),
@@ -54,7 +68,7 @@ class NewsList extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(5),
                           child: Image.network(
-                            news.articles[index].urlToImage,
+                            this.widget.articles[index].urlToImage,
                             fit: BoxFit.cover,
                             height: double.infinity,
                           ),
