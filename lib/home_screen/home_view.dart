@@ -44,10 +44,15 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     checkInternet(
       internetConnected: () {
-        fetchData();
+        setState(() {
+          state = screenState.loading;
+          fetchData();
+        });
       },
       internetNotConnected: () {
-        state = screenState.noInternet;
+        setState(() {
+          state = screenState.noInternet;
+        });
       }
     );
 
