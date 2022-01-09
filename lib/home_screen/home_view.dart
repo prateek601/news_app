@@ -114,7 +114,11 @@ class _HomeViewState extends State<HomeView> {
           openBottomSheet();
         },
         backgroundColor: primaryColor1,
-        child: const Icon(Icons.sort),
+        child: Image.asset(
+          'assets/filter.png',
+          height: 20,
+          width: 20,
+        ),
         tooltip: 'News source',
       ),
       body: state == screenState.noInternet
